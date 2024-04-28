@@ -57,24 +57,29 @@ def CollapseCalculator(grid_number, robot_movement_matrix, vacuum_cycle_length, 
     timestep += 1
     cycle_detected = False
 
+    maxLengthCheck = vacuum_cycle_length*grid_number*grid_number
 
     while cycle_detected == False:
-        PrintRoomWithTimestep(room, timestep)
+        #PrintRoomWithTimestep(room, timestep)
         direction = robot_movement_matrix[robot_position[0]][robot_position[1]]
         makeRobotMove(room, direction, robot_position)
 
         dust_position = MakeDustMove(room,timestep, vacuum_cycle_length, vacuum_cycle_positions, dust_position)
         if robot_position == list(dust_position):
-            print("Robot and Dust collapsed" , timestep)
+            print(timestep)
             break
 
-        if tuple(robot_position) in visited and cycleCount < 3:
+
+        if tuple(robot_position) in visited and cycleCount < maxLengthCheck:
             if (dust_position_in_cycle_start == dust_position):
                 print("Never")
                 break
             dust_position_in_cycle_start = dust_position
             visited = {}
             cycleCount += 1
+            if (cycleCount == maxLengthCheck - 1):
+                print("Never")
+                break
 
         visited[tuple(robot_position)] = True
 
@@ -85,10 +90,6 @@ def CollapseCalculator(grid_number, robot_movement_matrix, vacuum_cycle_length, 
 
         room[robot_position[0]][robot_position[1]] = 1
         timestep += 1
-        if timestep > 16:
-            print("Stopping.")
-            break
-
 
 def MakeDustMove(room, timestep, vacuum_cycle_length, vacuum_cycle_positions, previous_dust_position):
     dust_position = vacuum_cycle_positions[timestep % vacuum_cycle_length]
